@@ -1,0 +1,264 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   EVORA GIFTING — Design Tokens
+   A single, deliberately light brand palette (no dark mode) built around a
+   deep forest green, warm ivory, and a muted champagne/gold accent.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* Forest green — primary */
+  --color-forest-50: #eef2ee;
+  --color-forest-100: #d7e2d6;
+  --color-forest-200: #b0c5ad;
+  --color-forest-300: #85a480;
+  --color-forest-400: #5f8459;
+  --color-forest-500: #43663d;
+  --color-forest-600: #345031;
+  --color-forest-700: #2a4029;
+  --color-forest-800: #1f3020;
+  --color-forest-900: #142218;
+  --color-forest-950: #0c150f;
+
+  /* Warm ivory / cream — secondary surfaces */
+  --color-ivory-50: #fffdf9;
+  --color-ivory-100: #fbf7ee;
+  --color-ivory-200: #f5efdf;
+  --color-ivory-300: #eee4c9;
+
+  /* Champagne / muted gold — accent */
+  --color-champagne-100: #f2e6c9;
+  --color-champagne-300: #e2c98c;
+  --color-champagne-500: #c9a15e;
+  --color-champagne-600: #b0894a;
+  --color-champagne-700: #8f6f3c;
+
+  /* Beige + charcoal — supporting neutrals */
+  --color-beige-100: #f1ead9;
+  --color-beige-300: #e2d5b8;
+  --color-charcoal-600: #4a4842;
+  --color-charcoal-800: #2c2b27;
+  --color-charcoal-900: #1d1c19;
+
+  --background: var(--color-ivory-50);
+  --foreground: var(--color-charcoal-900);
+  --card: #ffffff;
+  --card-foreground: var(--color-charcoal-900);
+  --primary: var(--color-forest-800);
+  --primary-foreground: var(--color-ivory-50);
+  --secondary: var(--color-ivory-200);
+  --secondary-foreground: var(--color-forest-900);
+  --accent: var(--color-champagne-500);
+  --accent-foreground: var(--color-forest-950);
+  --muted: var(--color-beige-100);
+  --muted-foreground: var(--color-charcoal-600);
+  --border: var(--color-beige-300);
+  --input: var(--color-beige-300);
+  --ring: var(--color-forest-500);
+  --destructive: #a13a2f;
+  --destructive-foreground: #fff6f4;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-forest-50: var(--color-forest-50);
+  --color-forest-100: var(--color-forest-100);
+  --color-forest-200: var(--color-forest-200);
+  --color-forest-300: var(--color-forest-300);
+  --color-forest-400: var(--color-forest-400);
+  --color-forest-500: var(--color-forest-500);
+  --color-forest-600: var(--color-forest-600);
+  --color-forest-700: var(--color-forest-700);
+  --color-forest-800: var(--color-forest-800);
+  --color-forest-900: var(--color-forest-900);
+  --color-forest-950: var(--color-forest-950);
+
+  --color-ivory-50: var(--color-ivory-50);
+  --color-ivory-100: var(--color-ivory-100);
+  --color-ivory-200: var(--color-ivory-200);
+  --color-ivory-300: var(--color-ivory-300);
+
+  --color-champagne-100: var(--color-champagne-100);
+  --color-champagne-300: var(--color-champagne-300);
+  --color-champagne-500: var(--color-champagne-500);
+  --color-champagne-600: var(--color-champagne-600);
+  --color-champagne-700: var(--color-champagne-700);
+
+  --color-beige-100: var(--color-beige-100);
+  --color-beige-300: var(--color-beige-300);
+  --color-charcoal-600: var(--color-charcoal-600);
+  --color-charcoal-800: var(--color-charcoal-800);
+  --color-charcoal-900: var(--color-charcoal-900);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.6s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: var(--color-champagne-300);
+    color: var(--color-forest-950);
+  }
+}
+
+@utility slide-in-from-right {
+  animation: slide-in-from-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility slide-in-from-left {
+  animation: slide-in-from-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility slide-in-from-top {
+  animation: slide-in-from-top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility slide-in-from-bottom {
+  animation: slide-in-from-bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility slide-out-to-right {
+  animation: slide-out-to-right 0.2s ease-in forwards;
+}
+@utility slide-out-to-left {
+  animation: slide-out-to-left 0.2s ease-in forwards;
+}
+@utility slide-out-to-top {
+  animation: slide-out-to-top 0.2s ease-in forwards;
+}
+@utility slide-out-to-bottom {
+  animation: slide-out-to-bottom 0.2s ease-in forwards;
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-100%);
+  }
+}
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes slide-out-to-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-out-to-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slide-out-to-top {
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes slide-out-to-bottom {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .container-evora {
+    width: 100%;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-evora {
+      padding-inline: 2.5rem;
+    }
+  }
+}
