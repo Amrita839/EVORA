@@ -1,13 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Analysis } from "./lib/pipeline";
-import { aiConfigured } from "./lib/wording";
+import { probeAi } from "./lib/wording";
 
 interface Store {
   analysis: Analysis | null;
   setAnalysis: (a: Analysis | null) => void;
   aiOn: boolean;
   setAiOn: (v: boolean) => void;
-  /** AI is on and a backend exists. Otherwise templates are used. */
+  /** The server has an API key. null while checking. */
+  aiReady: boolean | null;
+  /** AI is on and the server is ready. Otherwise templates are used. */
   aiActive: boolean;
   dark: boolean;
   toggleTheme: () => void;
@@ -35,6 +37,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [aiOn, setAiOnState] = useState(() => read("replay.ai") !== "off");
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
 
+  const [aiReady, setAiReady] = useState<boolean | null>(null);
+  useEffect(() => {
+    probeAi().then(setAiReady);
+  }, []);
+
   const setAiOn = useCallback((v: boolean) => {
     setAiOnState(v);
     write("replay.ai", v ? "on" : "off");
@@ -46,8 +53,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [dark]);
 
   const value = useMemo(
-    () => ({ analysis, setAnalysis, aiOn, setAiOn, aiActive: aiOn && aiConfigured, dark, toggleTheme }),
-    [analysis, aiOn, setAiOn, dark, toggleTheme],
+    () => ({ analysis, setAnalysis, aiOn, setAiOn, aiReady, aiActive: aiOn && aiReady === true, dark, toggleTheme }),
+    [analysis, aiOn, setAiOn, aiReady, dark, toggleTheme],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

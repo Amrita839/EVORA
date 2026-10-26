@@ -5,7 +5,6 @@ import { rupees } from "../lib/format";
 import { SAMPLE_SPECS } from "../lib/samples";
 import {
   adviceFilter,
-  aiConfigured,
   resolveWording,
   type WordingResult,
 } from "../lib/wording";
@@ -18,7 +17,7 @@ const Pill = ({ ok, children }: { ok: boolean; children: React.ReactNode }) => (
 const list = (xs: string[]) => (xs.length ? xs.join(", ") : "none");
 
 export default function Evals() {
-  const { aiOn } = useStore();
+  const { aiOn, aiReady } = useStore();
   const rows = useMemo(runAllEvals, []);
   const passed = rows.filter((r) => r.pass).length;
 
@@ -27,7 +26,7 @@ export default function Evals() {
   const [safety, setSafety] = useState<{ note: string; result: WordingResult; rawLeak: string | null }[] | null>(null);
   const [safetyBusy, setSafetyBusy] = useState(false);
 
-  const canUseAi = aiOn && aiConfigured;
+  const canUseAi = aiOn && aiReady === true;
 
   const runWording = async () => {
     setWordingBusy(true);
@@ -133,7 +132,7 @@ export default function Evals() {
         <h2 id="t3" className="font-medium">AI wording</h2>
         {!canUseAi && (
           <p className="mt-1 text-sm text-muted">
-            {aiOn ? "No AI backend is connected here, so the app uses fixed wording." : "AI wording is off in the footer."} Turn it on with a connected backend to measure it.
+            {aiOn ? "No AI key is set on the server, so the app uses fixed wording." : "AI wording is off in the footer."} Turn it on with a connected backend to measure it.
           </p>
         )}
         <button

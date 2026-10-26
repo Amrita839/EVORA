@@ -128,27 +128,30 @@ export function validateWording(raw: string, facts: Facts): Validation {
 
 // ---------- AI call (edge function) ----------
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+const ENDPOINT = "/api/replay-wording";
 
-export const aiConfigured = Boolean(SUPABASE_URL && SUPABASE_KEY);
+/** Asks the server whether AI wording is set up (a key exists). Never throws. */
+export async function probeAi(): Promise<boolean> {
+  try {
+    const res = await fetch(ENDPOINT, { cache: "no-store" });
+    if (!res.ok) return false;
+    return Boolean(((await res.json()) as { ready?: unknown }).ready);
+  } catch {
+    return false;
+  }
+}
 
-/** Asks the edge function for wording. Returns the model's raw text, or an error. Never throws. */
+/** Asks the function for wording. Returns the model's raw text, or an error. Never throws. */
 export async function fetchAiRaw(
   facts: Facts,
   userNote?: string,
 ): Promise<{ raw: string } | { error: string }> {
-  if (!aiConfigured) return { error: "AI backend is not connected." };
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 20000);
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/replay-wording`, {
+    const res = await fetch(ENDPOINT, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY!,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ facts, user_note: userNote }),
       signal: ctrl.signal,
     });
