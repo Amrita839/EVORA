@@ -8,8 +8,7 @@
     <script>
       try {
         var t = localStorage.getItem("replay.theme");
-        var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-        if (dark) document.documentElement.classList.add("dark");
+        if (t) document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     </script>
   </head>

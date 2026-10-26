@@ -5,6 +5,9 @@ import Evals from "./pages/Evals";
 import Home from "./pages/Home";
 import Results from "./pages/Results";
 
+/** The hosted artifact build follows the viewer's theme instead of having its own switch. */
+const EMBEDDED = import.meta.env.VITE_ARTIFACT === "1";
+
 export default function App() {
   const { dark, toggleTheme } = useStore();
   return (
@@ -14,6 +17,7 @@ export default function App() {
           <span aria-hidden className="grid size-7 place-items-center rounded-full bg-accent text-sm text-bg">↺</span>
           Replay
         </Link>
+        {!EMBEDDED && (
         <button
           onClick={toggleTheme}
           aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
@@ -21,6 +25,7 @@ export default function App() {
         >
           {dark ? "Light" : "Dark"}
         </button>
+        )}
       </header>
       <main className="flex-1 pb-10">
         <Routes>

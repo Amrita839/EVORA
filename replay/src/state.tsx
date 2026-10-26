@@ -35,7 +35,10 @@ const write = (k: string, v: string) => {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [aiOn, setAiOnState] = useState(() => read("replay.ai") !== "off");
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  const [dark, setDark] = useState(() => {
+    const t = document.documentElement.getAttribute("data-theme");
+    return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  });
 
   const [aiReady, setAiReady] = useState<boolean | null>(null);
   useEffect(() => {
@@ -46,11 +49,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setAiOnState(v);
     write("replay.ai", v ? "on" : "off");
   }, []);
-  const toggleTheme = useCallback(() => setDark((d) => !d), []);
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-    write("replay.theme", dark ? "dark" : "light");
-  }, [dark]);
+  const toggleTheme = useCallback(() => {
+    setDark((d) => {
+      document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+      write("replay.theme", d ? "light" : "dark");
+      return !d;
+    });
+  }, []);
 
   const value = useMemo(
     () => ({ analysis, setAnalysis, aiOn, setAiOn, aiReady, aiActive: aiOn && aiReady === true, dark, toggleTheme }),
