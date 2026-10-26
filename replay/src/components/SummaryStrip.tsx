@@ -5,7 +5,7 @@ export default function SummaryStrip({ s }: { s: Summary }) {
   const items = [
     { label: "Net P&L", value: signedRupees(s.netPnl), tone: s.netPnl < 0 ? "text-loss" : "text-gain" },
     { label: "Trades", value: String(s.trades), tone: "" },
-    { label: "Win rate", value: `${Math.round(s.winRatePct)}%`, tone: "" },
+    { label: "Win rate", value: `${s.winRatePct.toFixed(1)}%`, tone: "" },
     { label: "Total charges", value: rupees(s.totalCharges), tone: "" },
   ];
   return (

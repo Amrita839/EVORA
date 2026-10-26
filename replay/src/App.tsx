@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import { useStore } from "./state";
+import Debug from "./pages/Debug";
 import Evals from "./pages/Evals";
 import Home from "./pages/Home";
 import Results from "./pages/Results";
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/results" element={<Results />} />
           <Route path="/evals" element={<Evals />} />
+          <Route path="/debug" element={<Debug />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

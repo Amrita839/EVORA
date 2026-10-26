@@ -20,6 +20,9 @@ export default function Footer() {
         <Link to="/evals" className="underline-offset-2 hover:underline">
           Test bench
         </Link>
+        <Link to="/debug" className="underline-offset-2 hover:underline">
+          Debug
+        </Link>
       </div>
     </footer>
   );
