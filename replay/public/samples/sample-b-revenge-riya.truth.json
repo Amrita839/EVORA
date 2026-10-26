@@ -1,0 +1,14 @@
+{
+  "dataset": "sample-b-revenge-riya",
+  "trader": "Revenge Riya",
+  "month": "2026-09",
+  "expected_habits": [
+    "revenge",
+    "no_stop_loss"
+  ],
+  "total_net_pnl": -101498.44,
+  "round_trips": 68,
+  "open_positions": 1,
+  "expected_row_errors": [],
+  "rejected_orders": 0
+}

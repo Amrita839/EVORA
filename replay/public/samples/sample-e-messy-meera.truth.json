@@ -1,0 +1,35 @@
+{
+  "dataset": "sample-e-messy-meera",
+  "trader": "Messy Meera",
+  "month": "2026-09",
+  "expected_habits": [
+    "expiry_day",
+    "far_otm"
+  ],
+  "total_net_pnl": -58621.93,
+  "round_trips": 57,
+  "open_positions": 0,
+  "expected_row_errors": [
+    {
+      "line": 14,
+      "kind": "bad_date"
+    },
+    {
+      "line": 41,
+      "kind": "missing_value"
+    },
+    {
+      "line": 62,
+      "kind": "bad_value"
+    },
+    {
+      "line": 82,
+      "kind": "unmatched_exit"
+    },
+    {
+      "line": 102,
+      "kind": "duplicate_order_id"
+    }
+  ],
+  "rejected_orders": 1
+}

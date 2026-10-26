@@ -1,0 +1,14 @@
+{
+  "dataset": "sample-a-expiry-eshaan",
+  "trader": "Expiry Eshaan",
+  "month": "2026-09",
+  "expected_habits": [
+    "expiry_day",
+    "far_otm"
+  ],
+  "total_net_pnl": -58621.93,
+  "round_trips": 57,
+  "open_positions": 0,
+  "expected_row_errors": [],
+  "rejected_orders": 0
+}

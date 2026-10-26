@@ -1,0 +1,14 @@
+{
+  "dataset": "sample-c-holding-harsh",
+  "trader": "Holding Harsh",
+  "month": "2026-09",
+  "expected_habits": [
+    "holding_losers",
+    "overtrading"
+  ],
+  "total_net_pnl": -30566.94,
+  "round_trips": 63,
+  "open_positions": 0,
+  "expected_row_errors": [],
+  "rejected_orders": 0
+}

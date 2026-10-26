@@ -1,0 +1,11 @@
+{
+  "dataset": "sample-d-disciplined-dev",
+  "trader": "Disciplined Dev",
+  "month": "2026-09",
+  "expected_habits": [],
+  "total_net_pnl": 36475.47,
+  "round_trips": 55,
+  "open_positions": 0,
+  "expected_row_errors": [],
+  "rejected_orders": 0
+}
