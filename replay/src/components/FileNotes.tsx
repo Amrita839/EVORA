@@ -4,8 +4,12 @@ import { plural } from "../lib/format";
 /** One quiet line about what was read, skipped or left out. Row errors sit behind an expander. */
 export default function FileNotes({ a }: { a: Analysis }) {
   const bits: string[] = [];
-  if (a.errors.length) bits.push(`${plural(a.errors.length, "row")} skipped`);
-  if (a.parse.rejectedIgnored) bits.push(`${plural(a.parse.rejectedIgnored, "rejected order")} ignored`);
+  // A rejected order never traded, so it is skipped too. Say which kind each skipped row was.
+  const skipped = a.errors.length + a.parse.rejectedIgnored;
+  if (skipped) {
+    const why = [a.errors.length && `${a.errors.length} with errors`, a.parse.rejectedIgnored && `${plural(a.parse.rejectedIgnored, "rejected order")}`].filter(Boolean);
+    bits.push(`${plural(skipped, "row")} skipped (${why.join(", ")})`);
+  }
   if (a.parse.cancelledIgnored) bits.push(`${plural(a.parse.cancelledIgnored, "cancelled order")} ignored`);
   if (a.openPositions) bits.push(`${plural(a.openPositions, "open position")} not counted`);
   if (bits.length === 0) return null;

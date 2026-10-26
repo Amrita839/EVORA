@@ -25,4 +25,9 @@ describe("golden file", () => {
   it("only expiry-day shows", () => {
     expect(a.top.map((h) => [h.id, Math.round(h.cost_rupees), h.affected_trade_ids.length, h.confidence])).toEqual([["expiry_day", 4285, 4, "Low"]]);
   });
+  it("edited file (G13 exit 60 -> 80) changes the answer", () => {
+    const edited = analyze(readFileSync(new URL("./fixtures/golden.csv", import.meta.url), "utf8").replace("SELL,75,60,MARKET", "SELL,75,80,MARKET"), "g");
+    expect(edited.summary.netPnl).toBeCloseTo(-2095);
+    expect(edited.top.map((h) => [h.id, Math.round(h.cost_rupees)])).toEqual([["expiry_day", 2785]]);
+  });
 });
