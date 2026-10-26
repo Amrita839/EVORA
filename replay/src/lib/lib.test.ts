@@ -55,25 +55,22 @@ describe("parse", () => {
 });
 
 describe("matchTrades", () => {
-  it("matches FIFO with partial exits and averages the exit", () => {
+  it("matches FIFO and makes one trade per exit", () => {
     const m = run(
       order({ order_id: "e1", timestamp: "2026-09-02 10:00:00", quantity: "100", price: "100", charges: "10" }),
       order({ order_id: "e2", timestamp: "2026-09-02 10:10:00", quantity: "100", price: "120", charges: "10" }),
       order({ order_id: "x1", timestamp: "2026-09-02 10:20:00", side: "SELL", quantity: "60", price: "110", charges: "6" }),
       order({ order_id: "x2", timestamp: "2026-09-02 10:30:00", side: "SELL", quantity: "100", price: "130", charges: "10" }),
     );
-    const [t1, t2] = m.trades;
-    // e1 closed by 60@110 then 40@130
-    expect(t1.id).toBe("e1");
-    expect(t1.qty).toBe(100);
-    expect(t1.exitAvgPrice).toBeCloseTo(118);
-    expect(t1.grossPnl).toBeCloseTo(1800);
-    expect(t1.holdMinutes).toBe(30);
-    expect(t1.charges).toBeCloseTo(10 + 6 + 4);
-    // e2 closed by the remaining 60@130 only: 40 units are still open
-    expect(t2.qty).toBe(60);
+    // e1 is closed by 60@110 then 40@130; e2 by the remaining 60@130 (40 units stay open)
+    expect(m.trades.map((t) => [t.qty, t.exitAvgPrice])).toEqual([[60, 110], [40, 130], [60, 130]]);
+    const [a, b, c] = m.trades;
+    expect(a.grossPnl).toBeCloseTo(600);
+    expect(a.charges).toBeCloseTo(6 + 6); // 60% of the entry ₹10 + the whole first exit
+    expect(b.charges).toBeCloseTo(4 + 4); // 40% of entry + 40% of the ₹10 exit
+    expect(c.charges).toBeCloseTo(6 + 6);
+    expect(a.holdMinutes).toBe(20);
     expect(m.openPositions).toBe(1);
-    expect(t2.charges).toBeCloseTo(6 + 6);
   });
   it("supports short trades", () => {
     const [t] = run(

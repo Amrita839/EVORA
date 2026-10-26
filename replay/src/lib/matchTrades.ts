@@ -29,6 +29,7 @@ export function classifyMoneyness(
 }
 
 interface Slice {
+  orderId: string;
   qty: number;
   price: number;
   ts: number;
@@ -46,8 +47,8 @@ interface Lot {
 const isStop = (o: Order) => o.orderType === "SL" || o.orderType === "SL-M";
 
 /**
- * Turns orders into round-trip trades. One trade = one entry order and everything that closed it (FIFO).
- * Partial exits become one trade with an average exit price. Open leftovers are not counted.
+ * Turns orders into round-trip trades, matching exits to entries first-in-first-out.
+ * One trade = one entry (or part of it) closed by one exit. Open leftovers are not counted.
  */
 export function matchTrades(orders: Order[]): MatchResult {
   const errors: RowError[] = [];
@@ -77,7 +78,7 @@ export function matchTrades(orders: Order[]): MatchResult {
       while (left > 1e-9 && queue.length > 0) {
         const lot = queue[0];
         const take = Math.min(left, lot.remaining);
-        lot.slices.push({ qty: take, price: o.price, ts: o.ts, charges: (o.charges * take) / o.quantity });
+        lot.slices.push({ orderId: o.orderId, qty: take, price: o.price, ts: o.ts, charges: (o.charges * take) / o.quantity });
         lot.remaining -= take;
         left -= take;
         if (lot.remaining <= 1e-9) {
@@ -112,48 +113,49 @@ export function matchTrades(orders: Order[]): MatchResult {
     for (const lot of queue) if (lot.slices.length > 0) finished.push(lot);
   }
 
-  const trades: Trade[] = finished.map((lot) => {
-    const e = lot.order;
-    const qty = lot.slices.reduce((s, x) => s + x.qty, 0);
-    const exitAvg = lot.slices.reduce((s, x) => s + x.price * x.qty, 0) / qty;
-    const exitTime = Math.max(...lot.slices.map((x) => x.ts));
-    const sign = lot.direction === "long" ? 1 : -1;
-    const gross = (exitAvg - e.price) * qty * sign;
-    const charges = (e.charges * qty) / e.quantity + lot.slices.reduce((s, x) => s + x.charges, 0);
-    const exitSide = lot.direction === "long" ? "SELL" : "BUY";
-    const hadStopLoss = (stopsByContract.get(contractKey(e)) ?? []).some(
-      (s) => s.side === exitSide && s.ts >= e.ts && s.ts <= exitTime,
-    );
-    const m = classifyMoneyness(e.instrument, e.strike, e.underlying);
-    const t: Trade = {
-      id: e.orderId,
-      contract: contractKey(e),
-      symbol: e.symbol,
-      instrument: e.instrument,
-      strike: e.strike,
-      expiry: e.expiry,
-      direction: lot.direction,
-      entryTime: e.ts,
-      exitTime,
-      entryDate: e.date,
-      entryClock: e.timestamp.slice(11, 16),
-      exitClock: new Date(exitTime).toISOString().slice(11, 16),
-      holdMinutes: (exitTime - e.ts) / 60000,
-      qty,
-      entryAvgPrice: e.price,
-      exitAvgPrice: exitAvg,
-      grossPnl: gross,
-      charges,
-      netPnl: gross - charges,
-      hadStopLoss,
-      moneyness: m.label,
-      distance: m.distance,
-      underlyingAtEntry: e.underlying,
-      positionValue: qty * e.price,
-    };
-    return t;
-  });
-  trades.sort((a, b) => a.entryTime - b.entryTime || a.id.localeCompare(b.id));
+  // One trade per matched exit: a buy of 150 sold as 75 + 75 is two trades.
+  const trades: Trade[] = finished.flatMap((lot) =>
+    lot.slices.map((slice) => {
+      const e = lot.order;
+      const sign = lot.direction === "long" ? 1 : -1;
+      const qty = slice.qty;
+      const gross = (slice.price - e.price) * qty * sign;
+      const charges = (e.charges * qty) / e.quantity + slice.charges;
+      const exitSide = lot.direction === "long" ? "SELL" : "BUY";
+      const hadStopLoss = (stopsByContract.get(contractKey(e)) ?? []).some(
+        (st) => st.side === exitSide && st.ts >= e.ts && st.ts <= slice.ts,
+      );
+      const m = classifyMoneyness(e.instrument, e.strike, e.underlying);
+      const t: Trade = {
+        id: lot.slices.length > 1 ? `${e.orderId}/${slice.orderId}` : e.orderId,
+        contract: contractKey(e),
+        symbol: e.symbol,
+        instrument: e.instrument,
+        strike: e.strike,
+        expiry: e.expiry,
+        direction: lot.direction,
+        entryTime: e.ts,
+        exitTime: slice.ts,
+        entryDate: e.date,
+        entryClock: e.timestamp.slice(11, 16),
+        exitClock: new Date(slice.ts).toISOString().slice(11, 16),
+        holdMinutes: (slice.ts - e.ts) / 60000,
+        qty,
+        entryAvgPrice: e.price,
+        exitAvgPrice: slice.price,
+        grossPnl: gross,
+        charges,
+        netPnl: gross - charges,
+        hadStopLoss,
+        moneyness: m.label,
+        distance: m.distance,
+        underlyingAtEntry: e.underlying,
+        positionValue: qty * e.price,
+      };
+      return t;
+    }),
+  );
+  trades.sort((a, b) => a.entryTime - b.entryTime || a.exitTime - b.exitTime || a.id.localeCompare(b.id));
   return { trades, openPositions, errors };
 }
 
